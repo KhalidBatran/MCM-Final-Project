@@ -7,7 +7,7 @@ import plotly.express as px
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 server = app.server
 
-df = pd.read_csv("https://raw.githubusercontent.com/KhalidBatran/MCM-Exercise-3/main/assets/Olympics%202024.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/KhalidBatran/MCM-Final-Project/main/assets/Olympics%202024.csv")
 
 # Ensure 'Medal Date' is parsed correctly, handling the specific format
 df['Medal Date'] = pd.to_datetime(df['Medal Date'], errors='coerce', format='%d-%b')
