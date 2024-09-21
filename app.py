@@ -8,8 +8,6 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 server = app.server
 
 df = pd.read_csv("https://raw.githubusercontent.com/KhalidBatran/MCM-Final-Project/main/assets/Olympics%202024.csv")
-
-# Ensure 'Medal Date' is parsed correctly, handling the specific format
 df['Medal Date'] = pd.to_datetime(df['Medal Date'], errors='coerce', format='%d-%b')
 df = df.dropna(subset=['Medal Date'])
 df['Day Month'] = df['Medal Date'].dt.strftime('%d %b')
@@ -51,6 +49,7 @@ sidebar = html.Div(
                 dbc.NavLink("Olympics Bar Chart", href="/fig1", active="exact"),
                 dbc.NavLink("Olympics Line Progression", href="/fig2", active="exact"),
                 dbc.NavLink("Olympics Gender Comparison", href="/fig3", active="exact"),
+                dbc.NavLink("Daily Medals Statistics", href="/fig4", active="exact"),  # New link for fig4
             ],
             vertical=True,
             pills=True,
@@ -111,6 +110,8 @@ def render_page_content(pathname):
         return fig2_layout()
     elif pathname == "/fig3":
         return fig3_layout()
+    elif pathname == "/fig4":
+        return fig4_layout()  # New layout function for fig4
     return html.Div(
         [
             html.H1("404: Not found", className="text-danger"),
@@ -120,154 +121,28 @@ def render_page_content(pathname):
         className="p-3 bg-light rounded-3",
     )
 
-# Callback for the sidebar toggle button
-@app.callback(
-    [Output("sidebar", "style"), Output("page-content", "style")],
-    Input("toggle-button", "n_clicks")
-)
-def toggle_sidebar(n_clicks):
-    if n_clicks % 2 == 1:
-        return {"display": "none"}, CONTENT_STYLE_COLLAPSED
-    return SIDEBAR_STYLE, CONTENT_STYLE
-
-# Figure 1 layout and callback
-def fig1_layout():
+# Figure 4 layout and callback
+def fig4_layout():
     return html.Div([
-        html.H1('Olympic Medals Count by Country', style={'textAlign': 'center'}),
-        dcc.Dropdown(
-            id='dropdown-country',
-            options=[{'label': 'All', 'value': 'All'}] + [{'label': i, 'value': i} for i in df['Country Code'].unique()],
-            value='All',
-            multi=True,
-            clearable=False,
-            placeholder="Choose a Country"
-        ),
-        dcc.Dropdown(
-            id='dropdown-sport',
-            options=[{'label': 'All', 'value': 'All'}] + [{'label': s, 'value': s} for s in df['Sport Discipline'].dropna().unique()],
-            value='All',
-            multi=False,
-            clearable=False,
-            placeholder="Choose a Sport"
-        ),
-        dcc.Graph(id="medals-count")
+        html.H1("Daily Olympic Medals and Country Statistics", style={'textAlign': 'center'}),
+        dcc.Graph(id='medals-daily-animation'),
+        html.P("Drag the slider to change the date and observe the changes in Olympic medals data."),
     ])
 
 @app.callback(
-    Output('medals-count', 'figure'),
-    [Input('dropdown-country', 'value'), Input('dropdown-sport', 'value')]
+    Output('medals-daily-animation', 'figure'),
+    Input('url', "pathname")
 )
-def update_fig1(selected_countries, selected_sport):
-    filtered_df = df if 'All' in selected_countries or not selected_countries else df[df['Country Code'].isin(selected_countries)]
-    if selected_sport != 'All':
-        filtered_df = filtered_df[filtered_df['Sport Discipline'] == selected_sport]
-    medal_counts = filtered_df.groupby(['Country Code', 'Medal Type']).size().reset_index(name='Count')
-
-    fig = px.bar(medal_counts, x='Country Code', y='Count', color='Medal Type', barmode='group',
-                 color_discrete_map={'Gold Medal': '#FFD700', 'Silver Medal': '#C0C0C0', 'Bronze Medal': '#CD7F32'})
-
-    fig.update_traces(hovertemplate='<b>Country Code:</b> %{x}<br><b>Count:</b> %{y}<extra></extra>')
-    return fig
-
-# Figure 2 layout and callback
-def fig2_layout():
-    return html.Div([
-        html.H1("Olympic Athletes' Medal Progression by Date", style={'textAlign': 'center'}),
-        dcc.Dropdown(
-            id='country-dropdown-fig2',
-            options=[{'label': 'All', 'value': 'All'}] + [{'label': country, 'value': country} for country in df['Country Code'].unique()],
-            value='All',
-            clearable=False,
-            style={'width': '50%', 'margin': '10px auto'},
-            placeholder="Choose a country"
-        ),
-        dcc.Graph(id='medals-line-chart'),
-        dcc.RangeSlider(
-            id='date-range-slider',
-            min=0,
-            max=len(pd.to_datetime(df['Medal Date']).dt.date.unique())-1,
-            value=[0, len(pd.to_datetime(df['Medal Date']).dt.date.unique())-1],
-            marks={i: {'label': date.strftime('%b %d')} for i, date in enumerate(sorted(pd.to_datetime(df['Medal Date']).dt.date.unique()))},
-            step=None
-        )
-    ])
-
-@app.callback(
-    Output('medals-line-chart', 'figure'),
-    [Input('date-range-slider', 'value'), Input('country-dropdown-fig2', 'value')]
-)
-def update_fig2(date_range, selected_country):
-    start_date = pd.to_datetime(df['Medal Date']).dt.date.unique()[date_range[0]]
-    end_date = pd.to_datetime(df['Medal Date']).dt.date.unique()[date_range[1]]
-    filtered_df = df[(pd.to_datetime(df['Medal Date']).dt.date >= start_date) & (pd.to_datetime(df['Medal Date']).dt.date <= end_date)]
-    if selected_country != 'All':
-        filtered_df = filtered_df[filtered_df['Country Code'] == selected_country]
-    
-    fig = px.line(
-        filtered_df,
-        x='Day Month',
-        y=filtered_df.index,
-        color='Athlete Name',
-        markers=True,
-        hover_data={
-            'Medal Type': True, 
-            'Country Code': True, 
-            'Gender': True, 
-            'Sport Discipline': True,
-            'Day Month': False,
-            filtered_df.index.name: False
-        }
-    )
-    fig.update_xaxes(rangeslider_visible=True, rangeselector=dict(
-        buttons=list([
-            dict(count=1, label='1m', step='month', stepmode='backward'),
-            dict(count=6, label='6m', step='month', stepmode='backward'),
-            dict(count=1, label='YTD', step='year', stepmode='todate'),
-            dict(count=1, label='1y', step='year', stepmode='backward'),
-            dict(step='all')
-        ])
-    ))
-    return fig
-
-# Figure 3 layout and callback
-def fig3_layout():
-    return html.Div([
-        html.H1("Comparison of Genders and Medals", style={'textAlign': 'center'}),
-        dcc.Dropdown(
-            id='country-dropdown-fig3',
-            options=[{'label': 'All', 'value': 'All'}] + [{'label': country, 'value': country} for country in df['Country Code'].unique()],
-            value='All',
-            multi=True,
-            clearable=False,
-            style={'width': '50%', 'margin': '10px auto'},
-            placeholder="Select countries"
-        ),
-        dcc.Graph(id='gender-medal-bar-chart')
-    ])
-
-@app.callback(
-    Output('gender-medal-bar-chart', 'figure'),
-    [Input('country-dropdown-fig3', 'value')]
-)
-def update_fig3(selected_countries):
-    if 'All' in selected_countries or not selected_countries:
-        filtered_df = df
+def update_fig4(pathname):
+    if pathname == "/fig4":
+        dff = df.copy()
+        fig = px.scatter(dff, x="gdpPercap", y="lifeExp", animation_frame="Day Month", animation_group="Athlete Name",
+                         size="pop", color="continent", hover_name="Country Code",
+                         log_x=True, size_max=55, range_x=[100, 100000], range_y=[25, 90])
+        fig["layout"].pop("updatemenus")  # Remove the play button and other animation controls
+        return fig
     else:
-        filtered_df = df[df['Country Code'].isin(selected_countries)]
+        return {}
 
-    medal_counts = filtered_df.groupby(['Gender', 'Medal Type']).size().reset_index(name='Count')
-
-    fig = px.bar(
-        medal_counts,
-        x='Medal Type',
-        y='Count',
-        color='Gender',
-        barmode='group',
-        facet_col='Gender',
-        color_discrete_map={'M': 'blue', 'F': 'pink'},
-        category_orders={"Medal Type": ["Bronze Medal", "Silver Medal", "Gold Medal"], "Gender": ["M", "F"]}
-    )
-    return fig
-    
 if __name__ == "__main__":
     app.run_server(debug=True)
