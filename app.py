@@ -171,8 +171,6 @@ def update_fig1(selected_countries, selected_sport):
 
 # Figure 2 layout and callback
 def fig2_layout():
-    slider_marks = {i: {'label': date.strftime('%b %d')} for i, date in enumerate(sorted(df['Medal Date'].dt.date.unique()))}
-    slider_marks[-1] = {'label': 'All'}
     return html.Div([
         html.H1("Olympic Athletes' Medal Progression by Date", style={'textAlign': 'center'}),
         dcc.Dropdown(
@@ -184,22 +182,24 @@ def fig2_layout():
             placeholder="Choose a country"
         ),
         dcc.Graph(id='medals-line-chart'),
-        dcc.Slider(
-            id='date-slider',
-            min=-1,
-            max=len(df['Medal Date'].dt.date.unique()) - 1,
-            value=-1,
-            marks=slider_marks,
+        dcc.RangeSlider(
+            id='date-range-slider',
+            min=0,
+            max=len(pd.to_datetime(df['Medal Date']).dt.date.unique())-1,
+            value=[0, len(pd.to_datetime(df['Medal Date']).dt.date.unique())-1],
+            marks={i: {'label': date.strftime('%b %d')} for i, date in enumerate(sorted(pd.to_datetime(df['Medal Date']).dt.date.unique()))},
             step=None
         )
     ])
 
 @app.callback(
     Output('medals-line-chart', 'figure'),
-    [Input('date-slider', 'value'), Input('country-dropdown-fig2', 'value')]
+    [Input('date-range-slider', 'value'), Input('country-dropdown-fig2', 'value')]
 )
-def update_fig2(slider_value, selected_country):
-    filtered_df = df if slider_value == -1 else df[df['Medal Date'].dt.date == df['Medal Date'].dt.date.unique()[slider_value]]
+def update_fig2(date_range, selected_country):
+    start_date = pd.to_datetime(df['Medal Date']).dt.date.unique()[date_range[0]]
+    end_date = pd.to_datetime(df['Medal Date']).dt.date.unique()[date_range[1]]
+    filtered_df = df[(pd.to_datetime(df['Medal Date']).dt.date >= start_date) & (pd.to_datetime(df['Medal Date']).dt.date <= end_date)]
     if selected_country != 'All':
         filtered_df = filtered_df[filtered_df['Country Code'] == selected_country]
     
@@ -218,6 +218,15 @@ def update_fig2(slider_value, selected_country):
             filtered_df.index.name: False
         }
     )
+    fig.update_xaxes(rangeslider_visible=True, rangeselector=dict(
+        buttons=list([
+            dict(count=1, label='1m', step='month', stepmode='backward'),
+            dict(count=6, label='6m', step='month', stepmode='backward'),
+            dict(count=1, label='YTD', step='year', stepmode='todate'),
+            dict(count=1, label='1y', step='year', stepmode='backward'),
+            dict(step='all')
+        ])
+    ))
     return fig
 
 # Figure 3 layout and callback
