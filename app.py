@@ -31,13 +31,6 @@ CONTENT_STYLE = {
     "transition": "0.3s",
 }
 
-CONTENT_STYLE_COLLAPSED = {
-    "margin-left": "2rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "transition": "0.3s",
-}
-
 # Collapsible Sidebar
 sidebar = html.Div(
     [
@@ -49,13 +42,12 @@ sidebar = html.Div(
                 dbc.NavLink("Olympics Bar Chart", href="/fig1", active="exact"),
                 dbc.NavLink("Olympics Line Progression", href="/fig2", active="exact"),
                 dbc.NavLink("Olympics Gender Comparison", href="/fig3", active="exact"),
-                dbc.NavLink("Daily Medals Statistics", href="/fig4", active="exact"),  # New link for fig4
+                dbc.NavLink("Daily Medals Statistics", href="/fig4", active="exact"),
             ],
             vertical=True,
             pills=True,
         ),
     ],
-    id="sidebar",
     style=SIDEBAR_STYLE,
 )
 
@@ -81,18 +73,6 @@ def home_layout():
             html.H1("The Olympic Medals Visualization", style={'font-weight': 'bold', 'margin-bottom': '20px'}),
             html.P("Welcome to the Olympic Medals Dashboard! Here, you can explore data from the Olympic Games for this year. "
                    "This dashboard provides insights into Olympic athletes and their achievements."),
-            html.Br(),
-            html.H2("Olympics Bar Chart"),
-            html.P("This visualization allows you to explore the total count of Olympic medals won by different countries, "
-                   "broken down by medal type (Gold, Silver, Bronze). You can filter the data by country and sport."),
-            html.Br(),
-            html.H2("Olympics Line Progression"),
-            html.P("This chart shows how athletes' medal counts progress over the dates of the competition. You can filter the data "
-                   "by country and specific dates."),
-            html.Br(),
-            html.H2("Olympics Gender Comparison"),
-            html.P("This bar chart compares the medals won by athletes of different genders, broken down by medal type. "
-                   "You can filter the data by country."),
         ]
     )
 
@@ -111,22 +91,27 @@ def render_page_content(pathname):
     elif pathname == "/fig3":
         return fig3_layout()
     elif pathname == "/fig4":
-        return fig4_layout()  # New layout function for fig4
-    return html.Div(
-        [
+        return fig4_layout()
+    else:
+        return html.Div([
             html.H1("404: Not found", className="text-danger"),
             html.Hr(),
             html.P(f"The pathname {pathname} was not recognised..."),
-        ],
-        className="p-3 bg-light rounded-3",
-    )
+        ])
 
-# Figure 4 layout and callback
+# Define layouts and callbacks for fig1, fig2, fig3, fig4 as needed.
+# Placeholder function definitions for fig1, fig2, fig3
+def fig1_layout():
+    return html.Div([html.H1("Figure 1 Title")])
+def fig2_layout():
+    return html.Div([html.H1("Figure 2 Title")])
+def fig3_layout():
+    return html.Div([html.H1("Figure 3 Title")])
+
 def fig4_layout():
     return html.Div([
         html.H1("Daily Olympic Medals and Country Statistics", style={'textAlign': 'center'}),
         dcc.Graph(id='medals-daily-animation'),
-        html.P("Drag the slider to change the date and observe the changes in Olympic medals data."),
     ])
 
 @app.callback(
@@ -136,9 +121,9 @@ def fig4_layout():
 def update_fig4(pathname):
     if pathname == "/fig4":
         dff = df.copy()
-        fig = px.scatter(dff, x="gdpPercap", y="lifeExp", animation_frame="Day Month", animation_group="Athlete Name",
-                         size="pop", color="continent", hover_name="Country Code",
-                         log_x=True, size_max=55, range_x=[100, 100000], range_y=[25, 90])
+        fig = px.scatter(dff, x="Country Code", y="Medal Type", animation_frame="Day Month", animation_group="Athlete Name",
+                         size="Medal Type", color="Gender", hover_name="Athlete Name",
+                         size_max=55)
         fig["layout"].pop("updatemenus")  # Remove the play button and other animation controls
         return fig
     else:
