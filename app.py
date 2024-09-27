@@ -10,7 +10,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_
 server = app.server
 
 # Data Loading and Preparation
-df = pd.read_csv("https://raw.githubusercontent.com/KhalidBatran/MCM-project-2/refs/heads/main/assets/Olympics%202024.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/KhalidBatran/MCM-Final-Project/refs/heads/main/assets/Olympics%202024.csv")
 
 # Print column names to see what's available
 print("Available columns:", df.columns)
