@@ -1,0 +1,153 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 13px;
+    overflow: hidden;
+}
+
+#page-content {
+    height: calc(170vh - 60px); /* Adjust 60px to match your navbar height */
+    overflow: hidden;
+}
+
+.navbar {
+    position: fixed;
+    top: 90px;
+    left: 0;
+    right: 0;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    width: 99%;
+    margin: 0 auto;
+    position: relative;
+    top: 10px;
+    padding: 5px 0;
+    height: 60px; /* Set this to match your navbar height */
+}
+
+.navbar-brand, .nav-link {
+    color: #000;
+    padding: 10px;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #006eff;
+    text-decoration: underline;
+}
+
+.text-center {
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+p {
+    color: #666;
+    max-width: 800px;
+    margin: 1px auto;
+}
+
+.btn-primary {
+    padding: 10px 24px;
+}
+
+.nav-link.active {
+    color: #006eff !important; /* Keeps the blue color on active state */
+    text-decoration: underline !important; /* Ensures the underline is shown */
+}
+
+.figure1 {
+    position: absolute;
+    top: -60px;  /* Center vertically */
+    left: -415px; /* Center horizontally */
+    width: 1430px ; /* Example width, adjust as needed */
+    height: 400px; /* Example height, adjust as needed */
+    margin-top: -200px; /* Half of height */
+    margin-left: -300px; /* Half of width */
+    box-shadow: 0 60px 12px rgba(0,0,0,0.1);
+    /* Add more styling here if needed */
+  }  
+  
+.figure2 {
+    position: absolute !important;
+    top: 295px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 1430px !important;
+    height: 80vh !important;
+    margin-top: -200px !important;
+    box-shadow: 0 10px 7px rgba(0,0,0,0.1) !important;
+}
+
+.figure3 {
+    position: absolute;
+    top: -60px;  /* Center vertically */
+    left: -415px; /* Center horizontally */
+    width: 1430px ; /* Example width, adjust as needed */
+    height: 400px; /* Example height, adjust as needed */
+    margin-top: -200px; /* Half of height */
+    margin-left: -300px; /* Half of width */
+    box-shadow: 0 60px 12px rgba(0,0,0,0.1);
+    /* Add more styling here if needed */
+  }  
+
+.body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.figure-container {
+    width: 100%;
+    height: 600px;
+    margin-top: 20px;
+}
+
+.filter-row {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.filter-dropdown {
+    width: 100%;
+}
+
+/* Remove or adjust these styles if they're causing issues */
+.figure1, .figure2, .figure3 {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.home-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 60px); /* Adjust 60px to match your navbar height */
+    text-align: center;
+    padding: 20px;
+    margin-top: -5vh; /* This will push the content up by 5% of the viewport height */
+}
+
+.home-content h1 {
+    margin-bottom: 20px;
+}
+
+.home-content p {
+    max-width: 800px;
+    margin-bottom: 20px;
+}
