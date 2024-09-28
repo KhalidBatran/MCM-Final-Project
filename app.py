@@ -10,7 +10,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_
 server = app.server
 
 # Data Loading and Preparation
-df = pd.read_csv("https://raw.githubusercontent.com/KhalidBatran/MCM-Final-Project/refs/heads/main/assets/Olympics%202024.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/KhalidBatran/MCM-project-2/refs/heads/main/assets/Olympics%202024.csv")
 
 # Print column names to see what's available
 print("Available columns:", df.columns)
@@ -207,7 +207,7 @@ def render_page_content(pathname):
                     clearable=False  # Add this line
                 ), width=6),
             ], className="mb-4"),
-            html.Div(id='fig1-container')
+            html.Div(id='fig1-container', className='figure1')  # Add className here
         ])
     elif pathname == "/fig2":
         return html.Div([
@@ -236,7 +236,7 @@ def render_page_content(pathname):
                     clearable=False  # Add this line
                 ), width=6),
             ], className="mb-4"),
-            html.Div(id='fig3-container')
+            html.Div(id='fig3-container', className='figure3')  # Add className here
         ])
     else:
         return "404 Page Not Found"  # Handle undefined routes
