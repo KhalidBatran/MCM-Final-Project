@@ -239,7 +239,7 @@ def render_page_content(pathname):
             html.Div(id='fig3-container', className='figure3')  # Add className here
         ])
     else:
-        return "404 Page Not Found"  # Handle undefined routes
+        return "404 Page Not Found (just made this for fun click on home page to start :D)"  # Handle undefined routes
 
 # Run the App
 if __name__ == "__main__":
